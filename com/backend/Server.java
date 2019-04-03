@@ -1,4 +1,4 @@
-package backend;
+package com.backend;
 
 public class Server {
     private FileHelper fileManager = new FileHelper();

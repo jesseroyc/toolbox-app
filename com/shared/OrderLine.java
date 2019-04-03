@@ -1,3 +1,4 @@
+package com.shared;
 
 public class OrderLine {
 	
@@ -28,7 +29,7 @@ public class OrderLine {
 	}
 	public String toString (){
 		return  "Item Name: " + theItem.getItemName() +
-				", Item ID: " + theItem.getItemId()+ "\n" + 
+				", Item ID: " + theItem.getItemId()+ "\n" +
 				"Order Quantity: " + orderQuantity + "\n";
 	}
 

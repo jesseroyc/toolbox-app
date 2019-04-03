@@ -1,4 +1,4 @@
-package backend;
+package com.backend;
 
 import java.io.IOException;
 import java.nio.file.Files;

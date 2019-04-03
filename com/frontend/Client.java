@@ -1,4 +1,4 @@
-package frontend;
+package com.frontend;
 
 public class Client {
 

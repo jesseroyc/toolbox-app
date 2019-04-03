@@ -1,3 +1,5 @@
+package com.shared;
+
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
