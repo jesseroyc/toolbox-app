@@ -9,7 +9,14 @@ public class Supplier {
 	private String supAddress;
 	private String supContactName;
 	private ArrayList <Item> itemList;
-	
+
+	public Supplier () {
+
+		supId = -1;
+		supName = "";
+		supAddress = "";
+		supContactName = "";
+	}
 	
 	public Supplier (int id, String name, String address, String contactName) {
 		
@@ -54,7 +61,6 @@ public class Supplier {
 	public String getSupContactName() {
 		return supContactName;
 	}
-
 
 	public void setSupContactName(String supContactName) {
 		this.supContactName = supContactName;
