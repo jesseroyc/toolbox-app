@@ -1,8 +1,8 @@
 package com.backend;
 
-import com.shared.*;
-
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class DatabaseHelper {
 
@@ -10,87 +10,88 @@ public class DatabaseHelper {
     private Statement stmt;
     private ResultSet rs;
 
+    // Oracle express Docker image with port binds 1521:1521
+    // The instance is a free-tier Ubuntu ec2 on AWS marketplace
     private class CredentialStore {
-        final static String USER = "SYSTEM";
-        final static String PASSWORD = "@dmin";
-        final static String HOSTNAME = "127.0.0.1";
+        final static String USER = "sct_user";
+        final static String PASSWORD = "reinvent_Dms_Sct_17";
+        final static String HOSTNAME = "ec2-18-216-46-195.us-east-2.compute.amazonaws.com";
         final static String PORT = "1521";
         final static String SID = "XE";
     }
 
     DatabaseHelper(){
-        initializeConnection("silent");
-        close("silent");
+        String logger = "silent";
+        initializeConnection(logger);
+        close(logger);
     }
 
-    public void selectOneItem(String name){
-        initializeConnection("silent");
-        selectItemPreparedStatement(name);
-        close("silent");
+    public String[] insertOneItem(String[] params){
+        String logger = "silent";
+        initializeConnection(logger);
+        params = insertItemPreparedStatement(params);
+        close(logger);
+        return params;
     }
 
-    public void selectOneSupplier(String name){
-        initializeConnection("silent");
-        selectSupplierPreparedStatement(name);
-        close("silent");
+    public String[] selectOneItem(String[] params){
+        String logger = "silent";
+        initializeConnection(logger);
+        params = selectPreparedStatement(params);
+        close(logger);
+        return params;
     }
 
-    public void insertOneItem(Item item){
-        initializeConnection("silent");
-        insertItemPreparedStatement(
-                item.getItemId(),
-                item.getItemName(),
-                item.getItemQuantity(),
-                item.getItemPrice(),
-                item.getItemSupplierId()
-        );
-        close("silent");
+    public String[] selectOneSupplier(String[] params){
+        String logger = "silent";
+        initializeConnection(logger);
+        params = selectPreparedStatement(params);
+        close(logger);
+        return params;
     }
 
-    public void insertOneSupplier(Supplier supplier){
-        initializeConnection("silent");
-        insertSupplierPreparedStatement(
-                supplier.getSupId(),
-                supplier.getSupName(),
-                supplier.getSupAddress(),
-                supplier.getSupContactName()
-        );
-        close("silent");
+    public String[] insertOneSupplier(String[] params){
+        String logger = "silent";
+        initializeConnection(logger);
+        params = insertSupplierPreparedStatement(params);
+        close(logger);
+        return params;
     }
 
-    public void selectManyItem(String name){
-        initializeConnection("silent");
-        selectItemPreparedStatement(name);
-        close("silent");
+    public ArrayList<String[]> insertManyItem(ArrayList<String[]> paramsArray){
+
+        String logger = "silent";
+        Iterator<String[]> paramsIterator = paramsArray.iterator();
+
+        initializeConnection(logger);
+
+        ArrayList<String[]> tmpParams = new ArrayList<>();
+        while (paramsIterator.hasNext()) {
+            String[] params = paramsIterator.next();
+            tmpParams.add(insertItemPreparedStatement(params));
+        }
+
+        close(logger);
+
+        return tmpParams;
     }
 
-    public void selectManySupplier(String name){
-        initializeConnection("silent");
-        selectSupplierPreparedStatement(name);
-        close("silent");
-    }
+    public ArrayList<String[]> insertManySupplier(ArrayList<String[]> paramsArray){
 
-    public void insertManyItem(Item item){
-        initializeConnection("silent");
-        insertItemPreparedStatement(
-                item.getItemId(),
-                item.getItemName(),
-                item.getItemQuantity(),
-                item.getItemPrice(),
-                item.getItemSupplierId()
-        );
-        close("silent");
-    }
+        String logger = "silent";
+        Iterator<String[]> paramsIterator = paramsArray.iterator();
 
-    public void insertManySupplier(Supplier supplier){
-        initializeConnection("silent");
-        insertSupplierPreparedStatement(
-                supplier.getSupId(),
-                supplier.getSupName(),
-                supplier.getSupAddress(),
-                supplier.getSupContactName()
-        );
-        close("silent");
+        initializeConnection(logger);
+
+        ArrayList<String[]> tmpParams = new ArrayList<>();
+        while (paramsIterator.hasNext()) {
+            String[] params = paramsIterator.next();
+            tmpParams.add(insertSupplierPreparedStatement(params));
+        }
+
+        close(logger);
+
+        return tmpParams;
     }
 
     private void initializeConnection(String logger) {
@@ -135,90 +136,89 @@ public class DatabaseHelper {
         }
     }
 
-    private void insertItemPreparedStatement(int id,String name,int quantity,Double price,int supplier_id) {
+    // TODO
+    private String[] insertItemPreparedStatement(String[] params) {
         try {
             String query = "INSERT INTO items (ID,name,quantity,price,supplier_id) values (?,?,?,?,?)";
             PreparedStatement pStat = conn.prepareStatement(query);
-            pStat.setInt(1, id);
-            pStat.setString(2, name);
-            pStat.setInt(3, quantity);
-            pStat.setDouble(4, price);
-            pStat.setDouble(5, supplier_id);
-            int rowCount = pStat.executeUpdate();
-            System.out.println("Database: row Count = " + rowCount);
+            pStat.setInt(1, Integer.parseInt(params[2]));
+            pStat.setString(2, params[3]);
+            pStat.setInt(3, Integer.parseInt(params[4]));
+            pStat.setDouble(4, Double.parseDouble(params[5]));
+            pStat.setDouble(5, Integer.parseInt(params[6]));
+            pStat.executeUpdate();
             pStat.close();
-            System.out.println("Database: Successful item insert");
+            params[1] = "success";
+            System.out.println("Database: Item Insert.");
+            return params;
         } catch (SQLException e) {
 
             if(e.getErrorCode() == 1)
                 System.out.println("Database: Item insert failed, item ID and NAME must be unique.");
             else
                 e.printStackTrace();
+            params[1] = "failed";
+            return params;
         }
     }
 
-    private void insertSupplierPreparedStatement(int id,String name,String address,String contact) {
+    private String[] insertSupplierPreparedStatement(String[] params) {
         try {
             String query = "INSERT INTO suppliers (ID,name,address,contact) values (?,?,?,?)";
             PreparedStatement pStat = conn.prepareStatement(query);
-            pStat.setInt(1, id);
-            pStat.setString(2, name);
-            pStat.setString(3, address);
-            pStat.setString(4, contact);
-            int rowCount = pStat.executeUpdate();
-            System.out.println("Database: Row Count = " + rowCount);
+            pStat.setInt(1, Integer.parseInt(params[2]));
+            pStat.setString(2, params[3]);
+            pStat.setString(3, params[4]);
+            pStat.setString(4, params[5]);
+            pStat.executeUpdate();
             pStat.close();
-            System.out.println("Database: Successful supplier insert");
+            params[2] = "success";
+            System.out.println("Database: Supplier Insert.");
+            return params;
         } catch (SQLException e) {
             if(e.getErrorCode() == 1)
                 System.out.println("Database: Supplier insert failed, supplier ID, NAME, and ADDRESS must be unique.");
             else
                 e.printStackTrace();
+            params[2] = "failed";
+            return params;
         }
     }
 
-    private void selectItemPreparedStatement(String name) {
+    private String[] selectPreparedStatement(String[] params) {
+        String resultParams = new String();
+        String type = params[1];
+        String name = params[4];
         try {
             String query = "SELECT * FROM items where name= ?";
             PreparedStatement pStat = conn.prepareStatement(query);
             pStat.setString(1, name);
             rs = pStat.executeQuery();
-            System.out.println("Database: Item query.");
+            System.out.println("Database: Item Query.");
             while (rs.next()) {
-                System.out.println(
-                        "  ID: " + rs.getString("ID") + " " +
-                        "Name: " + rs.getString("name") + " " +
-                        "Quantity: " + rs.getString("quantity") + " " +
-                        "Price: " + rs.getString("price") + " " +
-                        "Supplier ID: " + rs.getString("supplier_id")
-                );
-
+                if(type.equals("Items")) {
+                    resultParams = type + ";" + "success" + ";" +
+                            rs.getInt("ID") + ";" +
+                            rs.getString("name") + ";" +
+                            rs.getInt("quantity") + ";" +
+                            rs.getDouble("price") + ";" +
+                            rs.getInt("supplier_id");
+                }
+                if(type.equals("Suppliers"))
+                resultParams =
+                        type + ";" + "success" + ";" +
+                        rs.getString("ID") + ";" +
+                        rs.getString("name") + ";" +
+                        rs.getString("address") + ";" +
+                        rs.getString("contact");
             }
             pStat.close();
+            System.out.println(resultParams);
+            return resultParams.split("[;]");
         } catch (SQLException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void selectSupplierPreparedStatement(String name) {
-        try {
-            String query = "SELECT * FROM suppliers where name= ?";
-            PreparedStatement pStat = conn.prepareStatement(query);
-            pStat.setString(1, name);
-            rs = pStat.executeQuery();
-            System.out.println("Database: Supplier query.");
-            while (rs.next()) {
-                System.out.println(
-                        "  ID: " + rs.getString("ID") + " " +
-                        "Name: " + rs.getString("name") + " " +
-                        "Address: " + rs.getString("address") + " " +
-                        "Contact: " + rs.getString("contact")
-                );
-
-            }
-            pStat.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            params[2] = "failed";
+            return params;
         }
     }
 }

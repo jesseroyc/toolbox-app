@@ -1,84 +1,48 @@
 package com.shared;
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.net.InetAddress;
 
-public class Supplier {
-	
-	private int supId;
-	private String supName;
-	private String supAddress;
-	private String supContactName;
-	private ArrayList <Item> itemList;
+public class Supplier extends Model implements Serializable {
 
-	public Supplier () {
+	private String supplierName;
+	private String supplierAddress;
+	private String supplierContact;
 
-		supId = -1;
-		supName = "";
-		supAddress = "";
-		supContactName = "";
-	}
-	
-	public Supplier (int id, String name, String address, String contactName) {
-		
-		supId = id;
-		supName = name;
-		supAddress = address;
-		supContactName = contactName;
-		itemList = new ArrayList <Item>();
+	public Supplier (InetAddress ip, String[] params) {
+		super(ip,params[0],params[1],Integer.parseInt(params[2]));
+		this.supplierName = params[4];
+		this.supplierAddress = params[5];
+		this.supplierContact = params[6];
 	}
 
-
-	public int getSupId() {
-		return supId;
+	public String getSupplierName() {
+		return this.supplierName;
+	}
+	public String getSupplierAddress() {
+		return this.supplierAddress;
+	}
+	public String getSupplierContact() {
+		return this.supplierContact;
+	}
+	public void setSupplierName(String supplierName) {
+		this.supplierName = supplierName;
+	}
+	public void setSupplierAddress(String supplierAddress) {
+		this.supplierAddress = supplierAddress;
+	}
+	public void setSupplierContact(String supplierAddress) {
+		this.supplierContact = supplierAddress;
 	}
 
-
-	public void setSupId(int supId) {
-		this.supId = supId;
-	}
-
-
-	public String getSupName() {
-		return supName;
-	}
-
-
-	public void setSupName(String supName) {
-		this.supName = supName;
-	}
-
-
-	public String getSupAddress() {
-		return supAddress;
-	}
-
-
-	public void setSupAddress(String supAddress) {
-		this.supAddress = supAddress;
-	}
-
-
-	public String getSupContactName() {
-		return supContactName;
-	}
-
-	public void setSupContactName(String supContactName) {
-		this.supContactName = supContactName;
-	}
+	@Override
 	public String toString () {
-		return supName + " Supplier ID: " + supId+ "\n";
-		
+		return  this.ip + ";" +
+				this.type + ";" +
+				this.op + ";" +
+				this._id + ";" +
+				this.supplierName + ";" +
+				this.supplierAddress + ";" +
+				this.supplierContact;
 	}
-
-
-	public ArrayList <Item> getItemList() {
-		return itemList;
-	}
-
-
-	public void setItemList(ArrayList <Item> itemList) {
-		this.itemList = itemList;
-	}
-	
-
 }
